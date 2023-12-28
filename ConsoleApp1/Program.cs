@@ -12,7 +12,7 @@ namespace DialogSplitterApp
 		{
 
 			// Define the path to the file (change to the actual file path)
-			string filePath = @"C:\Users\Admin\Desktop\myFile.txt";
+			string filePath = @"C:\Users\Admin\Desktop\ExportedChat.txt";
 			string proccessedFilePath = @"C:\Users\Admin\Desktop\DialogProcessed.txt";
 
 			GenerateProcessedFile(filePath, proccessedFilePath);
@@ -29,8 +29,10 @@ namespace DialogSplitterApp
 				string content = File.ReadAllText(filePath);
 
 				// Remove the unwanted 'V' character before "Virk"
-				string processedContent = content.Replace("V\r\nVikr\r\n", "Vikr");
-				processedContent = processedContent.Replace("\r\nc.ai\r\n", string.Empty);
+				if (content.StartsWith("undefined"))
+					content = content["undefined".Length..];
+
+				string processedContent = content.Replace("\nc.ai", string.Empty);
 
 
 				// Write the processed content to a new file
@@ -52,8 +54,8 @@ namespace DialogSplitterApp
 				// Read the content of the file
 				string[] lines = File.ReadAllLines(proccessedFilePath);
 				// Define characters
-				string characterOne = "Vikr";
-				string characterTwo = "Higuchi Madoka";
+				string characterOne = "Vikr : ";
+				string characterTwo = "Higuchi Madoka : ";
 
 				// Initialize dialogues for each character
 				List<string> dialoguesCharacterOne = new List<string>();
@@ -64,16 +66,19 @@ namespace DialogSplitterApp
 
 				foreach (var line in lines)
 				{
+					
 					if (line.StartsWith(characterOne)){
 						
 						currentSpeaker = characterOne;
-						Console.WriteLine(currentSpeaker + " : " + line.Replace(currentSpeaker, string.Empty));
+						//Console.WriteLine(currentSpeaker + " : " + line.Replace(currentSpeaker, string.Empty));
+						Console.WriteLine(line);
 					}
 					else if (line.StartsWith(characterTwo))
 					{
 
 						currentSpeaker = characterTwo;
-						Console.WriteLine(currentSpeaker + " : " + line.Replace(currentSpeaker, string.Empty));
+						//Console.WriteLine(currentSpeaker + " : " + line.Replace(currentSpeaker, string.Empty));
+						Console.WriteLine(line);
 					}
 					else
 					{

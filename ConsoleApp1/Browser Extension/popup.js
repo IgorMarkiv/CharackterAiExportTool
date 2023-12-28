@@ -12,9 +12,30 @@ document.getElementById('downloadBtn').addEventListener('click', () => {
 // This function gets injected into the tab and sends back the HTML
 function tabScript() {
 
-    console.log("tabScript");
+    console.log("tabScript 1");
     var divs = document.getElementsByClassName("swiper-no-swiping");
-    var divsData = Array.from(divs).map(div => div.innerHTML); // or other relevant data
 
-    chrome.runtime.sendMessage({ divsData: divsData });
+    var chatDivContent = [];
+
+    for (var i = 0; i < divs.length; i++) {
+        var div = divs[i];
+        for (var i2 = 0; i2 < div.childElementCount; i2++) {
+
+            var rawInnerHTML = div.children[i2].innerHTML;
+            // Replace <br> with \n
+            processedInnerHtml = rawInnerHTML.replace(/<br\s*[\/]?>/gi, "\n");
+
+            // Replace <em> and </em> with *
+            processedInnerHtml = processedInnerHtml.replace(/<em>/gi, "*").replace(/<\/em>/gi, "*");
+
+            var conteainer = div.parentElement;
+
+            processedInnerHtml = conteainer.children[0].children[0].innerText + " : " + processedInnerHtml;
+            chatDivContent.push(processedInnerHtml);
+        }
+    }
+
+    console.log("processedInnerHtml", processedInnerHtml);
+
+    chrome.runtime.sendMessage({ chatDivContent: chatDivContent });
 }

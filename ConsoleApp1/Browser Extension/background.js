@@ -5,17 +5,17 @@
 // background.js
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     console.log("OnMessge", request);
-    if (request.divsData) {
+    if (request.chatDivContent) {
         // Now request.divsData is an array of HTML strings from the .swiper-no-swiping elements
         // You can directly use this data or initiate a download as you need
-        console.log("Received data from content script: ", request.divsData);
+        console.log("Received data from content script: ", request.chatDivContent);
 
         //var divs = request.document.getElementsByClassName("swiper-no-swiping");
 
         var htmlText;
 
         // Loop through each div using for...of and append its text content to the plainText variable
-        request.divsData.forEach(function (div) {
+        request.chatDivContent.forEach(function (div) {
             htmlText += div + '\n';
         });
 
