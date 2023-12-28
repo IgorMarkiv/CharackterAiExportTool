@@ -5,7 +5,12 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": [ "tabs", "activeTab", "downloads" ],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "downloads",
+    "scripting"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -14,5 +19,6 @@
       "matches": [ "<all_urls>" ],
       "js": [ "content.js" ]
     }
-  ]
+  ],
+  "host_permissions": [ "<all_urls>" ]
 }
