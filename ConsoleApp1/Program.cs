@@ -3,6 +3,9 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Net.Http.Json;
+using System.Text.Json;
+using ConsoleApp1.Entities;
 
 namespace DialogSplitterApp
 {
@@ -11,14 +14,44 @@ namespace DialogSplitterApp
 		static void Main(string[] args)
 		{
 
+			// test ------------------------------------------------------------------------------------------------------------------------------
+			string pathToCharacterCard = @"C:\Users\Admin\Desktop\Empty.json";
+			CharacterCard? characterCard = ReadCharacterCard(pathToCharacterCard);
+			if (characterCard == null)
+			{
+				Console.WriteLine("Char card is not properly configured abborting Export");
+			}
+		
+
+			// test ------------------------------------------------------------------------------------------------------------------------------
+
 			// Define the path to the file (change to the actual file path)
 			string filePath = @"C:\Users\Admin\Desktop\ExportedChat.txt";
 			string proccessedFilePath = @"C:\Users\Admin\Desktop\DialogProcessed.txt";
+			string exportedFilePath = @"C:\Users\Admin\Desktop\ExportedFile.json";
 
 			GenerateProcessedFile(filePath, proccessedFilePath);
-			DisplayProcessedFile(proccessedFilePath);
+			List<KeyValuePair<string, string>> chatHistory = DisplayProcessedFile(proccessedFilePath);
+			ExportToCustomModel(exportedFilePath, characterCard, chatHistory);
 		}
 
+
+		public static CharacterCard? ReadCharacterCard(string pathToCharacterCard)
+		{
+			try
+			{
+				string content = File.ReadAllText(pathToCharacterCard);
+
+				CharacterCard? characterCard = JsonSerializer.Deserialize<CharacterCard>(content);
+				return characterCard;
+
+			}
+			catch (Exception ex)
+			{
+				;
+				return null;
+			}
+		}
 
 		public static void GenerateProcessedFile(string filePath, string proccessedFilePath)
 		{
@@ -47,19 +80,18 @@ namespace DialogSplitterApp
 
 		}
 
-		public static void DisplayProcessedFile(string proccessedFilePath)
+		public static List<KeyValuePair<string, string>> DisplayProcessedFile(string proccessedFilePath)
 		{
 			try 
 			{
 				// Read the content of the file
 				string[] lines = File.ReadAllLines(proccessedFilePath);
 				// Define characters
-				string characterOne = "Vikr : ";
-				string characterTwo = "Higuchi Madoka : ";
+				string characterOne = " Vikr : ";
+				string characterTwo = " Higuchi Madoka : ";
 
 				// Initialize dialogues for each character
-				List<string> dialoguesCharacterOne = new List<string>();
-				List<string> dialoguesCharacterTwo = new List<string>();
+				List<KeyValuePair<string, string>> chatHistory = new();
 
 				// Determine the current speaker
 				string currentSpeaker = characterOne; // Assuming character one starts the conversation
@@ -86,12 +118,13 @@ namespace DialogSplitterApp
 					}
 
 					if (currentSpeaker.Equals(characterOne)){
-						dialoguesCharacterTwo.Add(line);
+						chatHistory.Add(new (characterOne, line.Replace(characterOne, string.Empty)));
 					}
 					else
 					{
-						dialoguesCharacterOne.Add(line);
+						chatHistory.Add(new (characterTwo, line.Replace(characterTwo, string.Empty)));
 					}
+
 
 					// Output the dialogues
 					//Console.WriteLine($"{characterOne}'s Dialogue:");
@@ -102,12 +135,50 @@ namespace DialogSplitterApp
 					//foreach (var dialogue in dialoguesCharacterTwo)
 					//	Console.WriteLine(dialogue);
 				}
+				return chatHistory;
 
 
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("An error occurred: " + e.Message);
+				return new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>() };
+			}
+		} 
+
+		public static void ExportToCustomModel(string exportedFilePath, CharacterCard characterCard, List<KeyValuePair<string, string>> chatHistory)
+		{
+			try
+			{
+				string currentCharacter = string.Empty;
+				foreach(var item in chatHistory)
+				{
+					characterCard.actions ??= [];
+					if(currentCharacter.Equals(item.Key))
+					{
+						characterCard.actions.Add(" \n " + item.Value);
+
+					}
+					else
+					{
+						currentCharacter = item.Key;
+						characterCard.actions.Add("\n"+item.Key + item.Value);
+					}
+				}
+
+				var options = new JsonSerializerOptions
+				{
+					Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+				};
+
+				// Write the processed content to a new file
+				string serializedCard = JsonSerializer.Serialize(characterCard, options);
+
+				File.WriteAllText(exportedFilePath, serializedCard, System.Text.Encoding.Unicode);
+			}
+			catch(Exception ex)
+			{
+				;
 			}
 		}
 	}
