@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <!--<script>
+
+        console.log('Test')
+
+        function Export() {
+
+            console.log("Test");
+
+            var divs = document.getElementsByClassName("swiper-no-swiping");
+
+            var htmlText;
+            // Loop through each div using for...of and append its text content to the plainText variable
+            Array.from(divs).forEach(function (div) {
+                htmlText += div.children[0].outerHTML + '\n';
+            });
+
+            let blob = new Blob([htmlText], { type: 'text/plain' });
+
+            let downloadLink = document.createElement("a");
+
+            downloadLink.download = "myFile.txt";
+
+            downloadLink.href = window.URL.createObjectURL(blob);
+
+            document.body.appendChild(downloadLink); // Needed for Firefox
+
+            downloadLink.click();
+        }
+
+    </script>-->
+
+        <script src="popup.js"></script>
+
+    <title>extension popup</title>
+    <style>
+        button {
+            padding: 10px;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button id="downloadBtn">Download HTML</button>
+
+</body>
+</html>
